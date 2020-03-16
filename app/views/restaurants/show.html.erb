@@ -1,50 +1,77 @@
- <div class="row">
- 	<div class="col-3">
- 		<%= image_tag @restaurant.image_url %>
 
-		<h2>
- 		 	 <%= @restaurant.name %>
-		</h2>
 
-		<p>
-  			<strong>Address:</strong>
-  			<%= @restaurant.address %>
-		</p>
+<div class="row">
+  <div class="col-md-3">
+    <%= image_tag @restaurant.image_url %>
 
-		<p>
- 		    <strong>Phone:</strong>
-    		<%= @restaurant.phone %>
-		</p>
+    <h2>
+      <%= @restaurant.name %>
+    </h2>
 
-		<p>
-   			<strong>Website:</strong>
-    		<%= link_to @restaurant.website, @restaurant.website %>
-		</p>
-		<%= link_to "Write Review", new_restaurant_review_path(@restaurant), class: "btn btn-primary" %>
- 	</div>
+    <div class="star-rating" data-score= <%= @avg_rating %> ></div>
+    <p><%= "#{@reviews.length} reviews" %></p>
+
+    <p>
+      <strong>Address:</strong>
+      <%= @restaurant.address %>
+    </p>
+
+    <p>
+      <strong>Phone:</strong>
+      <%= @restaurant.phone %>
+    </p>
+
+    <p>
+      <strong>Website:</strong>
+      <%= link_to @restaurant.website, @restaurant.website %>
+    </p>
+
+    <%= link_to "Write a Review", new_restaurant_review_path(@restaurant), class: "btn btn-primary" %>
+  </div>
 
   <div class="col-md-9">
     <% if @reviews.blank? %>
       <h3>No reviews yet. Be the first to write one!</h3>
     <% else %>
-      <% @reviews.each do |review| %>
-  	  <p><div class="star-rating"></div></p>
-  	  <p><%= review.rating %></p>
-  	  <p><%= review.comment %></p>
-         
-      <% end %>
+      <table class="table">
+        <thead>
+          <tr >
+            <th class="col-3"></th>
+            <th class="col-9"></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @reviews.each do |review| %>
+            <tr class="d-flex">
+              <td class="col-2">
+                <h4>
+                  <%= "#{review.user.first_name.capitalize} #{review.user.last_name.capitalize[0]}." %>
+                </h4>
+                <p><%= review.created_at.strftime("%-m/%-d/%y") %></p>
+              </td>
+
+              <td class="col-7">
+                <div class="star-rating" data-score= <%= review.rating %> ></div>
+                <p><%= h(review.comment).gsub(/\n/, '<br/>').html_safe %></p>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     <% end %>
   </div>
- </div>
-
-
-
+</div>
 
 <%= link_to 'Edit', edit_restaurant_path(@restaurant), class: "btn btn-link" %> |
 <%= link_to 'Back', restaurants_path, class: "btn btn-link" %>
 
 <script>
-	  $('.star-rating').raty({
-	  	 });
-
+  $('.star-rating').raty({
+    path: 'https://pbukurasyelpdemo.s3.us-east-2.amazonaws.com/uploads/stars',
+    readOnly: true,
+    score: function() {
+      return $(this).attr('data-score');
+    }
+  });
 </script>
